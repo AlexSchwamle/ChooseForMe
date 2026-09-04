@@ -1,7 +1,9 @@
+import Config 
 import sys
 from secrets import choice
 from time import sleep 
 
+ANIMATION_STEP_DUR = 0.1 # seconds 
 MAGIC_HIDE_CURSOR_CODE = "\033[?25l"
 MAGIC_SHOW_CURSOR_CODE = "\033[?25h"
 
@@ -23,10 +25,10 @@ def run():
 
     hideTerminalCursor() # Hide cursor while animation plays 
 
-    for _countdown in range(0, 30):
+    for _ in range(0, int(Config.ANIMATION_DURATION / ANIMATION_STEP_DUR)):
         funText = funTextBase + getRandomText(choices)
         print(f"\r{funText}{clearRestOfTerminalLine}", end="", flush=True)
-        sleep(0.1)
+        sleep(ANIMATION_STEP_DUR)
 
     flippedCoin = getRandomText(choices)
     print(f"\rThou Shalt: {flippedCoin}{clearRestOfTerminalLine}")

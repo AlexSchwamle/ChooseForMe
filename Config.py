@@ -1,0 +1,1 @@
+ANIMATION_DURATION = 2.5 # Seconds it takes cycling through all the choices with the "Flipping N-dimensional coin: {choices}" text
