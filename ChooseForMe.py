@@ -1,21 +1,29 @@
 import sys
-from secrets import choice 
+from secrets import choice
 from time import sleep 
 
-if len(sys.argv) < 3:
-    print("Usage: choose option1 option2 [option3 ...]")
-    sys.exit(1)
+def getRandomText(choices: list[str]) -> str:
+    return choice(choices)
 
-choices = sys.argv[1:]
+def run():
+    choices = sys.argv[1:]
+    funTextBase = f"Flipping {len(choices)}-dimensional coin: "
+    print(funTextBase, end="")
+    
+    largestChoiceLength = max(len(choice) for choice in choices)
+    clearRestOfTerminalLine = " " * (80-len(funTextBase)-largestChoiceLength) 
 
-funText = f"Flipping {len(choices)}-dimensional coin"
-print(funText, end="")
+    for _countdown in range(0, 30):
+        funText = funTextBase + getRandomText(choices)
+        print(f"\r{funText}{clearRestOfTerminalLine}", end="", flush=True)
+        sleep(0.1)
 
-for countdown in range(3, 0, -1):
-    funText += "."
-    print(f"\r{funText}", end="", flush=True)
-    sleep(1)
+    flippedCoin = getRandomText(choices)
+    print(f"\rThou Shalt: {flippedCoin}{clearRestOfTerminalLine}")
 
-flippedCoin = choice(choices)
-clearRestOfTerminalLine = " " * (80-len(funText))
-print(f"\rThou Shalt: {flippedCoin}{clearRestOfTerminalLine}")
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: choose option1 option2 [option3 ...]")
+        sys.exit(1)
+
+    run()
