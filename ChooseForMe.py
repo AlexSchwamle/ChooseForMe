@@ -2,12 +2,14 @@ import Config
 import sys
 from secrets import choice, randbelow
 from time import sleep 
+from os import get_terminal_size 
 
 CHOICE_ANIMATION_STEP_DUR = 0.1 # seconds 
 RANDCHAR_ANIMATION_STEP_DUR = 0.02 
 MAGIC_HIDE_CURSOR_CODE = "\033[?25l"
 MAGIC_SHOW_CURSOR_CODE = "\033[?25h"
 MAGIC_CLEAR_LINE_CODE = "\033[2K"
+TERMINAL_WIDTH = get_terminal_size().columns
 
 def reprintLine(text: str):
     print(f"{MAGIC_CLEAR_LINE_CODE}\r{text}", end="", flush=True)
@@ -34,10 +36,11 @@ def playRandomCharacterAnimation(choices: list[str]) -> None:
     animationSteps = int(Config.ANIMATION_DURATION / RANDCHAR_ANIMATION_STEP_DUR)
     largestChoiceLength = max(len(choice) for choice in choices)
     numberOfCharactersToShow = max(randbelow(largestChoiceLength+1), 5) # always animate at least 5 characters
+    numberOfCharactersToShow = min(numberOfCharactersToShow, TERMINAL_WIDTH - len(getFunTextBase(choices))) # Don't let the animation overflow the terminal
     stepsPerCharacter = animationSteps // numberOfCharactersToShow
     curNumCharactersToShow = 1 
     for step in range(0, animationSteps):
-        if step % stepsPerCharacter == 0:
+        if curNumCharactersToShow < numberOfCharactersToShow and step % stepsPerCharacter == 0: 
             curNumCharactersToShow += 1
 
         funTextAnimationChars = "".join(getRandomText(Config.RANDOM_LETTERS) for _ in range(curNumCharactersToShow))
