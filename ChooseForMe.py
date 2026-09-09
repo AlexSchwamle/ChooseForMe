@@ -8,8 +8,9 @@ RANDCHAR_ANIMATION_STEP_DUR = 0.02
 MAGIC_HIDE_CURSOR_CODE = "\033[?25l"
 MAGIC_SHOW_CURSOR_CODE = "\033[?25h"
 MAGIC_CLEAR_LINE_CODE = "\033[2K"
-RANDOM_LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789?#"
 
+def reprintLine(text: str):
+    print(f"{MAGIC_CLEAR_LINE_CODE}\r{text}", end="", flush=True)
 def hideTerminalCursor():
     print(MAGIC_HIDE_CURSOR_CODE, end="", flush=True)
 def showTerminalCursor():
@@ -21,7 +22,7 @@ def getRandomText(choices: list[str]|str) -> str:
 def playChoiceAnimation(funTextBase: str, choices: list[str]) -> None:
     for _ in range(0, int(Config.ANIMATION_DURATION / CHOICE_ANIMATION_STEP_DUR)):
         funText = funTextBase + getRandomText(choices)
-        print(f"{MAGIC_CLEAR_LINE_CODE}\r{funText}", end="", flush=True)
+        reprintLine(funText)
         sleep(CHOICE_ANIMATION_STEP_DUR)
 
 def playRandomCharacterAnimation(funTextBase: str, choices: list[str]) -> None:
@@ -34,8 +35,8 @@ def playRandomCharacterAnimation(funTextBase: str, choices: list[str]) -> None:
         if step % stepsPerCharacter == 0:
             curNumCharactersToShow += 1
         
-        funText = funTextBase + "".join(getRandomText(RANDOM_LETTERS) for _ in range(curNumCharactersToShow))
-        print(f"{MAGIC_CLEAR_LINE_CODE}\r{funText}", end="", flush=True)
+        funText = funTextBase + "".join(getRandomText(Config.RANDOM_LETTERS) for _ in range(curNumCharactersToShow))
+        reprintLine(funText)
         sleep(RANDCHAR_ANIMATION_STEP_DUR)
 
 def run():
@@ -50,12 +51,12 @@ def run():
     elif Config.ANIMATION_TYPE == "choice": 
         playChoiceAnimation(funTextBase, choices)
     elif Config.ANIMATION_TYPE != "none":
-        print("You didn't set Config.ANIMATION_TYPE to a valid value. Choosing for you...")
+        print(f"{MAGIC_CLEAR_LINE_CODE}\rYou didn't set Config.ANIMATION_TYPE to a valid value. Choosing for you...")
         roulette = choice((playRandomCharacterAnimation, playChoiceAnimation))
         roulette(funTextBase, choices)
 
     flippedCoin = getRandomText(choices)
-    print(f"{MAGIC_CLEAR_LINE_CODE}\rThou Shalt: {flippedCoin}")
+    reprintLine(f"Thou Shalt: {flippedCoin}")
 
     showTerminalCursor() # Always clean up after yourself
 
