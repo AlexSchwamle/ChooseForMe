@@ -1,1 +1,2 @@
-ANIMATION_DURATION = 2.5 # Seconds it takes cycling through all the choices with the "Flipping N-dimensional coin: {choices}" text
+ANIMATION_DURATION = 2.5 # Seconds it takes to run the animation below before seeing the result.
+ANIMATION_TYPE = "random" # "random" = random characters, "choice" = cycle through all your choices. "none" to disable.
