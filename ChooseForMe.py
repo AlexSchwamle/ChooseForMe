@@ -19,13 +19,18 @@ def showTerminalCursor():
 def getRandomText(choices: list[str]|str) -> str:
     return choice(choices)
 
-def playChoiceAnimation(funTextBase: str, choices: list[str]) -> None:
+def getFunTextBase(choices: list[str]) -> str:
+    return Config.funTextBase % len(choices)
+def getFinalChoiceText(choice: str) -> str:
+    return Config.finalChoiceText % choice 
+
+def playChoiceAnimation(choices: list[str]) -> None:
     for _ in range(0, int(Config.ANIMATION_DURATION / CHOICE_ANIMATION_STEP_DUR)):
-        funText = funTextBase + getRandomText(choices)
+        funText = getFunTextBase(choices) + getRandomText(choices)
         reprintLine(funText)
         sleep(CHOICE_ANIMATION_STEP_DUR)
 
-def playRandomCharacterAnimation(funTextBase: str, choices: list[str]) -> None:
+def playRandomCharacterAnimation(choices: list[str]) -> None:
     animationSteps = int(Config.ANIMATION_DURATION / RANDCHAR_ANIMATION_STEP_DUR)
     largestChoiceLength = max(len(choice) for choice in choices)
     numberOfCharactersToShow = max(randbelow(largestChoiceLength+1), 5) # always animate at least 5 characters
@@ -34,29 +39,30 @@ def playRandomCharacterAnimation(funTextBase: str, choices: list[str]) -> None:
     for step in range(0, animationSteps):
         if step % stepsPerCharacter == 0:
             curNumCharactersToShow += 1
-        
-        funText = funTextBase + "".join(getRandomText(Config.RANDOM_LETTERS) for _ in range(curNumCharactersToShow))
+
+        funTextAnimationChars = "".join(getRandomText(Config.RANDOM_LETTERS) for _ in range(curNumCharactersToShow))
+        funText = getFunTextBase(choices) + funTextAnimationChars
         reprintLine(funText)
         sleep(RANDCHAR_ANIMATION_STEP_DUR)
 
 def run():
     choices = sys.argv[1:]
-    funTextBase = f"Flipping {len(choices)}-dimensional coin: "
-    print(funTextBase, end="")
-    
+    print(getFunTextBase(choices), end="")
+
     hideTerminalCursor() # Hide blinking terminal cursor while animation plays 
 
     if Config.ANIMATION_TYPE == "random":
-        playRandomCharacterAnimation(funTextBase, choices)
+        playRandomCharacterAnimation(choices)
     elif Config.ANIMATION_TYPE == "choice": 
-        playChoiceAnimation(funTextBase, choices)
+        playChoiceAnimation(choices)
     elif Config.ANIMATION_TYPE != "none":
         print(f"{MAGIC_CLEAR_LINE_CODE}\rYou didn't set Config.ANIMATION_TYPE to a valid value. Choosing for you...")
         roulette = choice((playRandomCharacterAnimation, playChoiceAnimation))
-        roulette(funTextBase, choices)
+        roulette(choices)
 
     flippedCoin = getRandomText(choices)
-    reprintLine(f"Thou Shalt: {flippedCoin}")
+    finalText = getFinalChoiceText(flippedCoin)
+    reprintLine(finalText)
 
     showTerminalCursor() # Always clean up after yourself
 
