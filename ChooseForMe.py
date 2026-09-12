@@ -1,11 +1,13 @@
 import Config 
 import sys
+import string 
 from secrets import choice, randbelow
 from time import sleep 
 from os import get_terminal_size 
 
 CHOICE_ANIMATION_STEP_DUR = 0.1 # seconds 
 RANDCHAR_ANIMATION_STEP_DUR = 0.02 
+FINAL_CHOICE_ANIMATION_SLEEP_DUR = 0.01
 MAGIC_HIDE_CURSOR_CODE = "\033[?25l"
 MAGIC_SHOW_CURSOR_CODE = "\033[?25h"
 MAGIC_CLEAR_LINE_CODE = "\033[2K"
@@ -48,6 +50,37 @@ def playRandomCharacterAnimation(choices: list[str]) -> None:
         reprintLine(funText)
         sleep(RANDCHAR_ANIMATION_STEP_DUR)
 
+def playFinalChoiceAnimation(choice: str) -> None:
+    choiceAnimationState = ""
+    finalText = getFinalChoiceText("")
+
+    for letter in choice:
+        if letter.isupper():
+            animationPool = string.ascii_uppercase 
+        elif letter.islower():
+            animationPool = string.ascii_lowercase
+        elif letter.isnumeric():
+            animationPool = string.digits
+        else:
+            animationPool = None 
+
+        if animationPool is None:
+            sleep(FINAL_CHOICE_ANIMATION_SLEEP_DUR)
+            choiceAnimationState += letter 
+            finalText = getFinalChoiceText(choiceAnimationState)
+            reprintLine(finalText)
+            continue 
+
+        poolLetterIndex = 0 
+        poolLetter = animationPool[0]
+        reprintLine(getFinalChoiceText(choiceAnimationState + poolLetter))
+        while poolLetter != letter:
+            poolLetterIndex += 1 
+            poolLetter = animationPool[poolLetterIndex]
+            reprintLine(getFinalChoiceText(choiceAnimationState + poolLetter))
+            sleep(FINAL_CHOICE_ANIMATION_SLEEP_DUR)
+        choiceAnimationState += poolLetter 
+
 def run():
     choices = sys.argv[1:]
     print(getFunTextBase(choices), end="")
@@ -64,14 +97,17 @@ def run():
         roulette(choices)
 
     flippedCoin = getRandomText(choices)
-    finalText = getFinalChoiceText(flippedCoin)
-    reprintLine(finalText)
-
-    showTerminalCursor() # Always clean up after yourself
+    playFinalChoiceAnimation(flippedCoin)
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: choose option1 option2 [option3 ...]")
         sys.exit(1)
 
-    run()
+    try:
+        run()
+    except KeyboardInterrupt:
+        pass 
+    finally:
+        print()
+        showTerminalCursor() # Always clean up after yourself
