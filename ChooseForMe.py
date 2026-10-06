@@ -37,7 +37,7 @@ def playChoiceAnimation(choices: list[str]) -> None:
 def playRandomCharacterAnimation(choices: list[str]) -> None:
     animationSteps = int(Config.ANIMATION_DURATION / RANDCHAR_ANIMATION_STEP_DUR)
     largestChoiceLength = max(len(choice) for choice in choices)
-    numberOfCharactersToShow = max(randbelow(largestChoiceLength+1), 5) # always animate at least 5 characters
+    numberOfCharactersToShow = max(randbelow(largestChoiceLength+1), largestChoiceLength // 2) # animation length ∝ longest choice
     numberOfCharactersToShow = min(numberOfCharactersToShow, TERMINAL_WIDTH - len(getFunTextBase(choices))) # Don't let the animation overflow the terminal
     stepsPerCharacter = animationSteps // numberOfCharactersToShow
     curNumCharactersToShow = 1 
